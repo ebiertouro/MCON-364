@@ -1,0 +1,200 @@
+package binarySearchTree;
+import java.util.*;
+
+public class Main {
+	public static void main(String[] args) {
+		
+		BinarySearchTree<String> bst = new BinarySearchTree<String>();
+		
+		Scanner input = new Scanner(System.in);
+		
+		System.out.println("Welcome our Binary Seach Tree program.\n"
+				+ "Would you like to view automatically generated data, or input your own?"
+				+ " \nEnter 0 to input or 1 to randomly generate: ");
+		
+		while(!input.hasNextInt()) {
+			System.out.println("Invalid input. Enter 0 to input or 1 to automatically generate: ");
+			input.next();
+		}
+		int choice = input.nextInt();
+		 
+		while (choice != 0 && choice != 1) {
+			System.out.println("Invalid input. Enter 0 to input or 1 to automatically generate: ");
+			choice = input.nextInt();
+			}
+		
+		if(choice == 0) {
+			userInput(bst);
+		}
+	
+		else if(choice == 1) {
+			autoGenerate(bst);
+		}
+		input.close();
+		
+	}
+		public static void	autoGenerate(BinarySearchTree<String> bst) {
+			
+		System.out.println("We are inserting a few random strings into the tree...");
+		
+		bst.insert("kimberly");	
+		bst.insert("carrot cake");
+		bst.insert("bannana bread");
+		bst.insert("zuchini, julienned");
+		bst.insert("danger");
+		bst.insert("lucid, languid, and limpid");
+		bst.insert("when, oh when?");
+		bst.insert("aha, aha");
+		
+		System.out.println("Let's print our tree:\n" + bst);
+		
+		System.out.println("\nNow, we call the reset method, which generates a queue to hold our values\n"
+				+ "and enqueues each value in the tree, starting from the root.\nThere are three options for"
+				+ " dequeing - either left subtree-root-right subtree (in order), or \nroot-left subtree-"
+				+ "right subtree (preorder), or left subtree-right subtree-root (postorder).\nIn this case,"
+				+ "we chose inorder.\n");
+		
+		bst.reset(1);
+		
+		System.out.println("\nWe call the number of nodes to find the size of the tree."
+				+ "\nThis will be used for controlling our for loop.\n");
+		
+		int size = bst.numberOfNodes();
+		
+		for (int i = 0; i < size; i++) {
+			System.out.println(bst.getNextItem(1));
+		}
+		
+		System.out.println("\nNow we will print with preorder.\n");
+		
+		bst.reset(2);
+		
+		for (int i = 0; i < size; i++) {
+			System.out.println(bst.getNextItem(2));
+		}
+		
+		System.out.println("\n... And now, with postorder.\n");
+		
+		bst.reset(3);
+		
+		for (int i = 0; i < size; i++) {
+			System.out.println(bst.getNextItem(3));
+		}
+		
+		System.out.println("\nWe will now print out the tree in breadth-first order:\n");
+		
+		System.out.println(bst.getBreadthFirst());
+		
+		System.out.println("\nI am deleting the root and reprinting the tree in preorder.\n");
+		
+		bst.delete("kimberly");
+		
+		System.out.println("Let's print our tree:\n" + bst);
+		
+		System.out.println("\nWe will check if the tree contains 'carrot cake' and retreive it if so.\n");
+		
+		if(bst.isThere("carrot cake")) {
+			System.out.println("Retrieving a value: " + bst.retrieve("carrot cake"));
+		}
+		
+		System.out.println("\nI am deleting a leaf and reprinting the tree.\n");
+		
+		bst.delete("when, oh when?");
+		
+		System.out.println("Let's print our tree:\n" + bst);
+		
+	}	
+		public static void userInput(BinarySearchTree<String> bst) {
+			
+			Scanner input = new Scanner(System.in);
+			
+			System.out.println("Enter the number of strings that you wish to add to the tree: ");
+			
+			while(!input.hasNextInt()) {
+				System.out.println("Invalid input. Enter 0 to input or 1 to randomly generate: ");
+				input.next();
+			}
+			int numEntries = input.nextInt();
+			 
+			while (numEntries <= 0) {
+				System.out.println("Invalid input. Enter 0 to input or 1 to randomly generate: ");
+				numEntries = input.nextInt();
+				}
+			
+			input.nextLine();
+			
+			for (int i = 0; i < numEntries; i++) {
+				System.out.println("Enter your string: ");
+				while(!input.hasNextLine()) {
+					System.out.println("Invalid input. Enter a string: ");
+					input.next();
+				}
+				String userString = input.nextLine();
+				bst.insert(userString);
+			}
+			
+			System.out.println("This is your tree:\n" + bst);
+			
+			int size = bst.numberOfNodes();
+			
+			System.out.println("How would you like to print your tree?\n"
+					+ "Enter 1 for in order, 2 for pre-order, or 3 for post-order: ");
+			
+			while(!input.hasNextInt()) {
+				System.out.println("Invalid input. Enter 1, 2, or 3: ");
+				input.next();
+			}
+			
+			int printOrder = input.nextInt();
+			 
+			while (1 > printOrder || printOrder > 3) {
+				System.out.println("Invalid input. Enter 1, 2, or 3: ");
+				printOrder = input.nextInt();
+				}
+			
+			bst.reset(printOrder);
+			
+			for (int i = 0; i < size; i++) 
+				System.out.println(bst.getNextItem(printOrder));
+			
+			System.out.println("Enter 0 to view the tree in breadth-first order: ");
+			
+			while(!input.hasNextInt()) {
+				System.out.println("Invalid input. Enter 0: ");
+				 input.next();
+			}
+			int userChosesBF = input.nextInt();
+			
+			while (userChosesBF != 0) {
+				System.out.println("Invalid input. Enter 0: ");
+				userChosesBF = input.nextInt();
+				}
+			
+			System.out.println(bst.getBreadthFirst());
+			
+			System.out.println("Enter a string to remove from the list: ");
+			
+			while(!input.hasNextLine()) {
+				System.out.println("Invalid input. Enter a string: ");
+				input.next();
+			}
+			input.nextLine();
+			String removeThis = input.nextLine();
+			
+			while (!bst.isThere(removeThis)) {
+				System.out.println("That string does not exist in the tree.\n"
+						+ "Please enter a valid string.");
+				removeThis = input.nextLine();
+			}
+			
+			bst.delete(removeThis);
+			
+			System.out.println("Displaying your adjusted tree: ");
+			
+			System.out.println(bst);
+			
+			System.out.println("Goodbye!");
+				
+			input.close();
+		}
+}
