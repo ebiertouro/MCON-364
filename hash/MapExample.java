@@ -1,6 +1,7 @@
 package hashing;
 
 import java.io.*;
+import java.net.URL;
 import java.util.*;
 
 public class MapExample {
@@ -11,9 +12,7 @@ public class MapExample {
 		 
 		 Scanner input = new Scanner(System.in);
 		 
-		 String filePath = "C:/Users/Bier/Desktop/touro/Data Structures/Do Not Adieu, a play in two acts.txt";
-		 //this text file is a "Hello World" program in the Shakespeare programming language 
-		 
+
 		 
 		 System.out.println("Welcome! This program reads a file and creates a map of its word frequency.");
 		 
@@ -29,7 +28,7 @@ public class MapExample {
 		 else //if (hashChoice == 1)
 			 hashFunction = new SophisticatedHashFunction();
 		 
-		Map<String, Integer> map = readFile(hashFunction, filePath);
+		Map<String, Integer> map = readFile(hashFunction, input);
 			
 		 System.out.println("Your map has been created! Choose what to do with it: ");
 		 System.out.println("1 - View the word count for a particular word"
@@ -55,30 +54,31 @@ public class MapExample {
 
 	 }
 	 
-	 public static Map<String, Integer> readFile(HashFunctionInterface hashFunction, String filePath) {
+	 public static Map<String, Integer> readFile(HashFunctionInterface hashFunction, Scanner input) {
 		 
 		 //this method reads the file, breaks it down into words, and passes each word to the 
 		 //processWord method
 		    
 		    Map<String, Integer> map = new Map<String, Integer>(MAPSIZE);
+		    URL url = MapExample.class.getResource("DoNotAdieu.txt");
+		  //this text file is a "Hello World" program in the Shakespeare programming language
+		    
+		    try (FileReader fin = new FileReader(new File(url.getFile()));
+		             Scanner fileReader = new Scanner(fin)) {
 
-		    try (FileReader fileReader = new FileReader(filePath);
-		         BufferedReader bufferedReader = new BufferedReader(fileReader)) {
-
-		        String line;
-		        while ((line = bufferedReader.readLine()) != null) {
-		            String[] words = line.split("\\s+");
-		            for (String word : words) {
-		                processWord(word, hashFunction, map);
+		            while (fileReader.hasNextLine()) {
+		                String line = fileReader.nextLine();
+		                String[] words = line.split("\\s+");
+		                for (String word : words) {
+		                    processWord(word, hashFunction, map);
+		                }
 		            }
+
+		            return map;
+
+		        } catch (IOException e) {
+		            e.printStackTrace();
 		        }
-		        
-		        return map; // Moved outside of the while loop
-
-		    } catch (IOException e) {
-		        e.printStackTrace();
-		    }
-
 		    return null;
 		}
 
