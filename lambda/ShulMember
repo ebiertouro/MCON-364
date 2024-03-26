@@ -1,0 +1,102 @@
+package lambda;
+
+import java.util.*;
+
+class ShulMember implements Comparable<ShulMember> {
+
+    private String lastNameOfMember;
+    private String firstNameOfMember;
+    private Date birthDateOfMember;
+    private String spouseFirstName;
+    private String spouseLastName;
+    private String[] childrenNames;
+    private int yearsOfMembership;
+
+    // Constructor
+    public ShulMember(String lastNameOfMember, String firstNameOfMember, Date birthDateOfMember, String spouseFirstName, String spouseLastName, String[] childrenNames, int yearsOfMembership) {
+        this.lastNameOfMember = lastNameOfMember;
+        this.firstNameOfMember = firstNameOfMember;
+        this.birthDateOfMember = birthDateOfMember;
+        this.spouseFirstName = spouseFirstName;
+        this.spouseLastName = spouseLastName;
+        this.childrenNames = childrenNames;
+        this.yearsOfMembership = yearsOfMembership;
+    }
+
+    // Getters
+    public String getLastNameOfMember() {
+        return lastNameOfMember;
+    }
+
+    public String getFirstNameOfMember() {
+        return firstNameOfMember;
+    }
+
+    public Date getBirthDateOfMember() {
+        return birthDateOfMember;
+    }
+
+    public String getSpouseFirstName() {
+        return spouseFirstName;
+    }
+
+    public String getSpouseLastName() {
+        return spouseLastName;
+    }
+
+    public String[] getChildrenNames() {
+        return childrenNames;
+    }
+
+    public int getYearsOfMembership() {
+        return yearsOfMembership;
+    }
+
+    // Setters
+    public void setLastNameOfMember(String lastNameOfMember) {
+        this.lastNameOfMember = lastNameOfMember;
+    }
+
+    public void setFirstNameOfMember(String firstNameOfMember) {
+        this.firstNameOfMember = firstNameOfMember;
+    }
+
+    public void setBirthDateOfMember(Date birthDateOfMember) {
+        this.birthDateOfMember = birthDateOfMember;
+    }
+
+    public void setSpouseFirstName(String spouseFirstName) {
+        this.spouseFirstName = spouseFirstName;
+    }
+
+    public void setSpouseLastName(String spouseLastName) {
+        this.spouseLastName = spouseLastName;
+    }
+
+    public void setChildrenNames(String[] childrenNames) {
+        this.childrenNames = childrenNames;
+    }
+
+    public void setYearsOfMembership(int yearsOfMembership) {
+        this.yearsOfMembership = yearsOfMembership;
+    }
+
+    @Override
+    public int compareTo(ShulMember o) {    // for age of member
+        return this.birthDateOfMember.compareTo(o.getBirthDateOfMember());
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Member: ").append(firstNameOfMember).append(" ").append(lastNameOfMember).append("\n");
+        sb.append("Spouse: ").append(spouseFirstName).append(" ").append(spouseLastName).append("\n");
+        sb.append("Children: \n");
+        for (String child : childrenNames) {
+            sb.append(child).append("\n");
+        }
+        sb.append("Years of Membership: ").append(yearsOfMembership).append("\n");
+        return sb.toString();
+    }
+
+}
