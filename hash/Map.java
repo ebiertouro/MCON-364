@@ -1,16 +1,17 @@
 package hashing;
 import java.util.*;
 
-public class Map<K, V extends Comparable<V>> 
-implements Iterable<MapEntryInterface>, HashMapInterface {
+public class Map<K, V extends Comparable<V>>  implements Iterable<MapEntryInterface>, HashMapInterface {
 
 	private int capacity;
 	
 	private Array<LinkedList<MapEntryInterface>> map;
+	//our map consists of a custom array of custom linked lists, which hold map entries
 	
 	private int usedCapacity = 0;
 	
 	private final double loadFactor;
+	//when we hit the loadfactor, we resize the map 
 	
 	public Map(int capacity) {
 		this.capacity = capacity;
@@ -19,6 +20,10 @@ implements Iterable<MapEntryInterface>, HashMapInterface {
 	}
 
 	@Override
+	
+	 // a double iterator which iterates over each linked list in each array
+	//it works by putting each element into one big linked list
+	 
 	public Iterator<MapEntryInterface> iterator() {
 	    return new MyIterator();
 	}
@@ -63,26 +68,26 @@ implements Iterable<MapEntryInterface>, HashMapInterface {
 		
 		usedCapacity++;
 		
+		//check if we have to resize
 		if (usedCapacity >= loadFactor) {
 			resizeArray();
 		}
 		
 		int index = mapEntry.getIndex(capacity);
 		
+		//if there is not yet a linked list in that array index, we create one containing our entry
 		if (map.get(index) == null) {
 	        map.set(index, new LinkedList<MapEntryInterface>());
 	    }
 		
-		map.get(index).add(mapEntry);
-		
-		
+		//if a linked list exists, we append our entry
+		map.get(index).add(mapEntry);	
     }
 	
-	public int getListSize(LinkedList<MapEntryInterface> bucket) {
-		return bucket.size();
-	}
-	
 	private void resizeArray() {
+		
+		//we create a new map and copy
+		
 	    int newCapacity = capacity * 2;
 	    Array<LinkedList<MapEntryInterface>> newArray = new Array<LinkedList<MapEntryInterface>>(newCapacity);
 
@@ -97,7 +102,6 @@ implements Iterable<MapEntryInterface>, HashMapInterface {
 	            }
 	        }
 	    }
-
 	    map = newArray;
 	    capacity = newCapacity;
 	}
@@ -111,8 +115,12 @@ implements Iterable<MapEntryInterface>, HashMapInterface {
 	@Override
 	public boolean contains(MapEntryInterface mapEntry) {
 	    LinkedList<MapEntryInterface> bucket = map.get(mapEntry.getIndex(capacity));
+	    
+	    //we check the index - if null, no entry with that hashcode was inserted
 	    if (bucket == null || bucket.isEmpty())
 	        return false;
+	    
+	    //then we walk down the linked list to find the entry
 	    
 	    if (bucket.get(0).getKey().equals(mapEntry.getKey())) 
 	        return true;
@@ -130,10 +138,16 @@ implements Iterable<MapEntryInterface>, HashMapInterface {
 
 	@Override
 	public void remove(MapEntryInterface mapEntry) {
+		
+		//first check if an entry with that hashcode was inserted
+		
 	    LinkedList<MapEntryInterface> bucket = map.get(mapEntry.getIndex(capacity));
 	    if (bucket.isEmpty()) {
 	        return; // Nothing to remove
 	    }
+	    
+	    //we walk down the linked list. if found, we remove. otherwise, we exit
+	    
 	    if (bucket.get(0).getKey().equals(mapEntry.getKey())) {
 	        bucket.remove(0);
 	    } else {
@@ -148,21 +162,33 @@ implements Iterable<MapEntryInterface>, HashMapInterface {
 
 	@Override
 	public MapEntryInterface get(MapEntryInterface mapEntry) {
-			 LinkedList<MapEntryInterface> bucket = map.get(mapEntry.getIndex(capacity));
-			    if (bucket.get(0).getKey().equals(mapEntry.getKey()))
-			        return bucket.get(0);
-			    else {
+		
+	// we return the map entry that already exists in the map if it matches the new one
+		
+		//we look for it. if not found, we return null
+		
+		LinkedList<MapEntryInterface> bucket = map.get(mapEntry.getIndex(capacity));
+			if (bucket.get(0).getKey().equals(mapEntry.getKey()))
+				return bucket.get(0);
+			else {
 			    for (int i = 1; i < bucket.size(); i++) {
 			        if (bucket.get(i).getKey().equals(mapEntry.getKey())) {
 			           return bucket.get(i);
 			        }
 			    }
-			    }
+			  }
 				return null;
 	}
 	
 	@Override
 	public String toString() {
+		
+		 /*
+		  * a grand state-of-the-union report about our map
+		  * we print out every non-null bucket, as well as info about how many buckets are used
+		  * it shows a clear visual of average chain length
+		 */
+		
 	    StringBuilder result = new StringBuilder("This map consists of " + map.size() + " buckets.\n");
 	    int totalValue = 0;
 	    int nullBuckets = 0;
@@ -173,9 +199,9 @@ implements Iterable<MapEntryInterface>, HashMapInterface {
 	        else{	// Print out each slot and its length
 	        	
 	        	 if (bucket.size() == 1) 
-		            	result.append("Slot ").append(i +1).append(": 1 word: ");
+		            	result.append("Slot ").append(i +1).append(": 1 entry: ");
 		            else
-		            	result.append("Slot ").append(i +1).append(": " + bucket.size() + " words: ");
+		            	result.append("Slot ").append(i +1).append(": " + bucket.size() + " entries: ");
 		            
 	        	 
 	            for (MapEntryInterface mapEntry : bucket) {
@@ -186,14 +212,7 @@ implements Iterable<MapEntryInterface>, HashMapInterface {
 	            result.append("\n");
 	        }
 	    }
-	    result.append("Total words: " + totalValue + "\nUnused map slots: ").append(nullBuckets);
-	    
-
-	    /*
-	     
-o	How many buckets do you have using one hash function, vs the other ? 
-How long are your chains with one hash function vs another (which is a measure of collisions)
-	     */
+	    result.append("Total entries: " + totalValue + "\nUnused map slots: ").append(nullBuckets);
 
 	    return result.toString();
 	}

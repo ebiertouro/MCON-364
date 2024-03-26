@@ -12,7 +12,9 @@ public class MapExample {
 		 Scanner input = new Scanner(System.in);
 		 
 		 String filePath = "C:/Users/Bier/Desktop/touro/Data Structures/Do Not Adieu, a play in two acts.txt";
-		    
+		 //this text file is a "Hello World" program in the Shakespeare programming language 
+		 
+		 
 		 System.out.println("Welcome! This program reads a file and creates a map of its word frequency.");
 		 
 		 System.out.println("To create a map, you need to choose your prefered hash function: ");
@@ -21,6 +23,7 @@ public class MapExample {
 		 int hashChoice = chooseFromMenu(input, 0, 2, -1);
 		 
 		 HashFunctionInterface hashFunction;
+		 
 		 if (hashChoice == 0)
 			 hashFunction = new NaiveHashFunction();
 		 else //if (hashChoice == 1)
@@ -33,15 +36,18 @@ public class MapExample {
 		 		+ " and how many words share its map location.");
 		 System.out.println("2 - View words in descending order according to word count.");
 		 System.out.println("3 - View a report on the internal structure of the map.");
+		 System.out.println("4 - Get a report as you insert new entries into the map.");
 		 
-		 int actionChoice = chooseFromMenu(input, 0, 3, -1);
+		 int actionChoice = chooseFromMenu(input, 0, 4, -1);
 		 
 		 if (actionChoice == 0)
 			 wordCount(map, input, hashFunction);
 		 else if (actionChoice == 1)
 			 printMap(map);
-		 else //if (actionChoice ==2)
+		 else if (actionChoice ==2)
 			 mapReport(map);
+		 else // if (actionChoice ==3)
+			 insertionReport(map, input, hashFunction);
 		 
 		 System.out.println("Thank you for using our map!");
 		 input.close();
@@ -51,6 +57,8 @@ public class MapExample {
 	 
 	 public static Map<String, Integer> readFile(HashFunctionInterface hashFunction, String filePath) {
 		 
+		 //this method reads the file, breaks it down into words, and passes each word to the 
+		 //processWord method
 		    
 		    Map<String, Integer> map = new Map<String, Integer>(MAPSIZE);
 
@@ -78,6 +86,13 @@ public class MapExample {
 	    
 	    public static Map<String, Integer> processWord(String word, HashFunctionInterface hashFunction, Map<String, Integer> map) {
 
+	    	/*
+	    	 * this method removes punctuation, converts to lowercase, and instantiates a 
+	    	 * WordEntry object for each word. incrementing values if the word exists already
+	    	 * is done in main, NOT in the map, because the map must remain GENERIC, for different
+	    	 * type of MapEntryInterfaces and different usages
+	    	 */
+	    	
 			String cleanedWord = word.replaceAll("[^a-zA-Z]", "").toLowerCase();
 	    	WordEntry wordEntry = new WordEntry(cleanedWord, hashFunction);  
 	        	if (map.contains(wordEntry)) {
@@ -95,8 +110,12 @@ public class MapExample {
 	    	
 	    	ArrayList<MapEntryInterface> list = new ArrayList<MapEntryInterface>();
 	    	
+	    	//use the map's iterator to retrieve each entry
+	    	
 	    	for (MapEntryInterface mapEntry: map)
 	    		list.add(mapEntry);
+	    	
+	    	//sort by WordEntry's Comparable value
 	    	
 	    	Collections.sort(list);
 	    	
@@ -125,17 +144,25 @@ public class MapExample {
 			return menuOption -1;
 		}
 	    
-	    public static void wordCount(Map<String, Integer> map, Scanner input, HashFunctionInterface hashFunction) {
+	    public static void wordCount(Map<String, Integer> map, Scanner input, 
+	    		HashFunctionInterface hashFunction) {
 	    	
 	    	System.out.println("Enter a word: ");
-	    	input.nextLine();
+	    	input.nextLine();	//clear the keyboard buffer
 	    	String wordChoice = input.nextLine();
+	    	
+	    	//create a new WordEntry with the user's word
 	    	WordEntry checkingEntry = new WordEntry(wordChoice, hashFunction);
 	    	
 	    	if (map.contains(checkingEntry)) {
+	    		
+	    		//we retrieve the matching WordEntry from the map and check its value
 	    		WordEntry chosenEntry = (WordEntry) map.get(checkingEntry);
+	    		
 	    		System.out.println("There are " + chosenEntry.getValue() + 
 	    				" instances of the word '" + chosenEntry.getKey() + "' in this file.");
+	    		
+	    		//we check how many words share the same index
 	    		int bucketSize = map.getBucketSize(chosenEntry);
 	    		if (bucketSize == 1)
 	    			System.out.println("'" + chosenEntry.getKey() + 
@@ -149,6 +176,57 @@ public class MapExample {
 	    }
 		
 	    public static void mapReport(Map<String, Integer> map) {
+	    	
+	    	//we simply call the map's toString method, which has all the information we need!
+	    	
 	    	System.out.println("\n" + map + "\n");
+	    }
+	    
+	    public static void insertionReport(Map<String, Integer> map,
+	    									Scanner input, HashFunctionInterface hashFunction) {
+	    	
+	    	//the user can choose from a list of 5 words
+	    	
+	    	String[] wordList = {"romeo", "pitcher", "cake", "juliet", "sky"};
+	    	
+	    	System.out.println("Choose a word from the menu to insert it into the map."
+	    			+ "\nYou have 5 choices, and may choose the same word multiple times: ");
+	    	for (int i  = 0; i < 5; i++) {
+	    		
+	    		for (int k = 0; k < wordList.length; k++)
+	    			System.out.println((k + 1) + " - " + wordList[k]);
+	    			
+	    		int wordChoice = chooseFromMenu(input, 0, 5, -1);
+	    		
+	    		//we create a WordEntry with the user's choice
+	    		WordEntry userEntry = new WordEntry(wordList[wordChoice], hashFunction);
+	    		
+	    		/*
+	    		 * if the map contains that word, we retrieve it, report it's value,
+	    		 * increment it, and report again
+	    		 */
+	    		if(map.contains(userEntry)) {
+	    			System.out.println("The map already contains the word " 
+	    					+ userEntry.getKey() + " at index " 
+	    					+ userEntry.getIndex(map.size()) + ".");
+	    			
+	    			WordEntry retrievedWordEntry = (WordEntry) map.get(userEntry);
+	    			System.out.println("That word was added to the map " + retrievedWordEntry.getValue() 
+	    			+ " times.");
+	    			retrievedWordEntry.incrementValue();
+	    			System.out.println("Adding " + retrievedWordEntry.getKey() +
+	    					"...\nThat word has now been added to the map " + retrievedWordEntry.getValue() 
+	    					+ " times.");
+	    		}
+	    		//if the map does not contain that word, we insert it
+	    		else {
+	    			System.out.println("The map does not yet contain the word " + userEntry.getKey());
+	    			System.out.println("We are inserting it at index: " + userEntry.getIndex(map.size()));
+	    			map.insert(userEntry);
+	    			System.out.println("The map now contains the word " + userEntry.getKey());
+	    		}
+	    			
+	    	}
+	    	System.out.println();
 	    }
 }
