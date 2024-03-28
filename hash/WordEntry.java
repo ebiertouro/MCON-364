@@ -1,6 +1,7 @@
 package hashing;
 
-public class WordEntry implements MapEntryInterface  
+public class WordEntry implements MapEntryInterface 
+	//interfaces increase code reusablitiy and flexibility
 {
 	
 	private String key;

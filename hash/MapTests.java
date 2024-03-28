@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 class MapTests {
 	
-	 Map<String, Integer> testMap = new Map<String, Integer>(3);
+	 CustomMap<String, Integer> testMap = new CustomMap<String, Integer>(3);
 	 HashFunctionInterface function = new DummyHash();
      WordEntry word1 = new WordEntry("hello", function);
      WordEntry word2 = new WordEntry("hi", function);

@@ -3,63 +3,56 @@ package hashing;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
+import java.util.function.IntPredicate;
 
 public class MapExample {
 	
 	final static int MAPSIZE = 500;
 	
-	 public static void main(String[] args) {
-		 
-		 Scanner input = new Scanner(System.in);
-		 
+	public static void main(String[] args) {
+	    Scanner input = new Scanner(System.in);
 
-		 
-		 System.out.println("Welcome! This program reads a file and creates a map of its word frequency.");
-		 
-		 System.out.println("To create a map, you need to choose your prefered hash function: ");
-		 System.out.println("1 - naive\n2 - sophisticated");
-		 
-		 int hashChoice = chooseFromMenu(input, 0, 2, -1);
-		 
-		 HashFunctionInterface hashFunction;
-		 
-		 if (hashChoice == 0)
-			 hashFunction = new NaiveHashFunction();
-		 else //if (hashChoice == 1)
-			 hashFunction = new SophisticatedHashFunction();
-		 
-		Map<String, Integer> map = readFile(hashFunction, input);
-			
-		 System.out.println("Your map has been created! Choose what to do with it: ");
-		 System.out.println("1 - View the word count for a particular word"
-		 		+ " and how many words share its map location.");
-		 System.out.println("2 - View words in descending order according to word count.");
-		 System.out.println("3 - View a report on the internal structure of the map.");
-		 System.out.println("4 - Get a report as you insert new entries into the map.");
-		 
-		 int actionChoice = chooseFromMenu(input, 0, 4, -1);
-		 
-		 if (actionChoice == 0)
-			 wordCount(map, input, hashFunction);
-		 else if (actionChoice == 1)
-			 printMap(map);
-		 else if (actionChoice ==2)
-			 mapReport(map);
-		 else // if (actionChoice ==3)
-			 insertionReport(map, input, hashFunction);
-		 
-		 System.out.println("Thank you for using our map!");
-		 input.close();
-		 System.exit(0);
+	    System.out.println("Welcome! This program reads a file and creates a map of its word frequency.");
 
-	 }
-	 
-	 public static Map<String, Integer> readFile(HashFunctionInterface hashFunction, Scanner input) {
+	    System.out.println("To create a map, you need to choose your preferred hash function: ");
+	    System.out.println("1 - naive\n2 - sophisticated");
+
+	    int hashChoice = chooseFromMenu(input, 0, 2, -1);
+
+	    HashFunctionInterface hashFunction = (hashChoice == 0) ? new NaiveHashFunction() : new SophisticatedHashFunction();
+
+	    CustomMap<String, Integer> map = readFile(hashFunction, input);
+
+	    System.out.println("Your map has been created! Choose what to do with it: ");
+	    System.out.println("1 - View the word count for a particular word and how many words share its map location.");
+	    System.out.println("2 - View words in descending order according to word count.");
+	    System.out.println("3 - View a report on the internal structure of the map.");
+	    System.out.println("4 - Get a report as you insert new entries into the map.");
+
+	    int actionChoice = chooseFromMenu(input, 0, 4, -1);
+
+	    //use of lambdas for efficiency
+	    Map<Integer, Runnable> actions = Map.of(
+	            0, () -> wordCount(map, input, hashFunction),
+	            1, () -> printMap(map),
+	            2, () -> mapReport(map),
+	            3, () -> insertionReport(map, input, hashFunction)
+	    );
+
+	    actions.getOrDefault(actionChoice, () -> {}).run();
+
+	    System.out.println("Thank you for using our map!");
+	    
+		input.close();
+		System.exit(0);
+	}
+
+	 public static CustomMap<String, Integer> readFile(HashFunctionInterface hashFunction, Scanner input) {
 		 
 		 //this method reads the file, breaks it down into words, and passes each word to the 
 		 //processWord method
 		    
-		    Map<String, Integer> map = new Map<String, Integer>(MAPSIZE);
+		    CustomMap<String, Integer> map = new CustomMap<String, Integer>(MAPSIZE);
 		    URL url = MapExample.class.getResource("DoNotAdieu.txt");
 		  //this text file is a "Hello World" program in the Shakespeare programming language
 		    
@@ -84,7 +77,7 @@ public class MapExample {
 
 
 	    
-	    public static Map<String, Integer> processWord(String word, HashFunctionInterface hashFunction, Map<String, Integer> map) {
+	    public static CustomMap<String, Integer> processWord(String word, HashFunctionInterface hashFunction, CustomMap<String, Integer> map) {
 
 	    	/*
 	    	 * this method removes punctuation, converts to lowercase, and instantiates a 
@@ -106,7 +99,7 @@ public class MapExample {
 	        
 	    }
 	    
-	    public static void printMap(Map<String, Integer> map) {
+	    public static void printMap(CustomMap<String, Integer> map) {
 	    	
 	    	ArrayList<MapEntryInterface> list = new ArrayList<MapEntryInterface>();
 	    	
@@ -123,28 +116,29 @@ public class MapExample {
 	    		System.out.println(mapEntry);
 	    }
 	    public static int chooseFromMenu(Scanner input, int lowerbound, int upperbound, int priorChoice) {
-			
-			//an input validation that forces the user to choose a correct menu option
-			
-			int menuOption;
-			while(!input.hasNextInt()) {
-				System.out.println("Invalid input. Enter a number from the list: ");
-				input.next();
-			}
-			menuOption = input.nextInt();
-			 
-			while (menuOption <= lowerbound || menuOption > upperbound) {
-				System.out.println("Invalid input. Enter a number from the list: ");
-				menuOption = input.nextInt();
-				}
-			while (menuOption == priorChoice) {
-				System.out.println("Invalid input. You may not enter the same number twice: ");
-				menuOption = input.nextInt();
-				}
-			return menuOption -1;
-		}
+	    	
+	    	//this method forces users to choose a valid menu choice
+	        // Input validation using lambda expressions
+	    	
+	        IntPredicate isValidInput = i -> i > lowerbound && i <= upperbound && i != priorChoice;
+
+	        System.out.println("Enter a number from the list: ");
+	        int menuOption = input.nextInt();
+
+	        while (!isValidInput.test(menuOption)) {
+	            if (menuOption == priorChoice) {
+	                System.out.println("You may not enter the same number twice: ");
+	            } else {
+	                System.out.println("Invalid input. Enter a number from the list: ");
+	            }
+	            menuOption = input.nextInt();
+	        }
+
+	        return menuOption - 1;
+	    }
+
 	    
-	    public static void wordCount(Map<String, Integer> map, Scanner input, 
+	    public static void wordCount(CustomMap<String, Integer> map, Scanner input, 
 	    		HashFunctionInterface hashFunction) {
 	    	
 	    	System.out.println("Enter a word: ");
@@ -175,14 +169,14 @@ public class MapExample {
 	    		System.out.println("Sorry, the map does not contain that word.");
 	    }
 		
-	    public static void mapReport(Map<String, Integer> map) {
+	    public static void mapReport(CustomMap<String, Integer> map) {
 	    	
 	    	//we simply call the map's toString method, which has all the information we need!
 	    	
 	    	System.out.println("\n" + map + "\n");
 	    }
 	    
-	    public static void insertionReport(Map<String, Integer> map,
+	    public static void insertionReport(CustomMap<String, Integer> map,
 	    									Scanner input, HashFunctionInterface hashFunction) {
 	    	
 	    	//the user can choose from a list of 5 words
