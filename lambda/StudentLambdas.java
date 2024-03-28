@@ -143,10 +143,14 @@ map to get their names, and collect to put the names into a new list.
 			*/
 			
 			  List<Student> students = Stream.generate(randomFemaleStudentSupplier())
-			  .filter(isAdult).limit(100).filter(hasHighGpa)
+			  .filter(isAdult.and(hasHighGpa))
+			  .limit(100)
+			  .peek(student -> student.setName(student.getName() + " - Scholar"))
 			   .collect(Collectors.toList());
 			  
-			  students.stream().forEach(student -> student.setName(student.getName() + " - Scholar"));
+			  List<String> studentNames = students.stream()
+		                .map(Student::getName)
+		                .collect(Collectors.toList());
 		
 	}
 
@@ -182,50 +186,26 @@ Use the addSuffixToName BiFunction to add a suffix to each student's name based
 on their GPA (suffix is "- Honors" if GPA is above 3.5, "- Regular" otherwise).
 Collect the names of these students into a list.
 
+ 
 
 */
+    public static Student addSuffixToName(Student student, double gpa) {
+        String suffix = (gpa > 3.5) ? "- Honors" : "- Regular";
+        student.setName(student.getName() + suffix);
+        return student;
+    }
+    
+    Predicate<Student> hasGpaAbove (double gpa){
+    	return student -> student.getGpa() > gpa;
+    }
+    
+    List<Student> studentsWithSuffix = Stream.generate(randomFemaleStudentSupplier())
+    				.limit(100)
+    				.filter(hasGpaAbove(3.5))
+    				.map(student -> addSuffixToName(student, student.getGpa()))
+    				.collect(Collectors.toList());
 
 
-
-/* Question 11
-Use the randomStudentSupplier to generate a list of 100 students.
-Transform each student into a string representation of their details using studentToString.
-Filter out the strings that represent adult students.
-Print each of these strings using System.out::println.
-
-
-*/
-
-
-/* 
-Question 12
-Use the randomStudentSupplier to generate a list of 100 students.
-Use the updateAge BiFunction to increment the age of each student by 1.
-Filter out students who are now adults using isAdult.
-Collect the names of these students into a list.
-
-*/
-
-
-/* 
-Question 13
-Use the randomStudentSupplier to generate a list of 100 students.
-Use the updateAge BiFunction to increment the age of each student by 1.
-Filter out students who are now adults using isAdult.
-Collect the names of these students into a list.
-
-*/
-
-
-/*
-Question 14
-Use the randomStudentSupplier to generate a list of 100 students.
-Use the updateName BiFunction to prepend "Student: " to the name of each student.
-Transform each student into a string representation of their details using studentToString.
-Collect these strings into a list.
-
-
-*/
 
 	
 	 
