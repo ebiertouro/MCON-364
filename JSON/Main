@@ -7,38 +7,19 @@ import java.io.*;
 import java.text.ParseException;
 
 public class Main {
-	 public static void main(String[] args) {
-	        Map<String, Product> products = new LinkedHashMap<>(); // Using LinkedHashMap for maintaining insertion order
-	        Queue<List<Product>> orderQueue = new PriorityQueue<>(Comparator.comparingInt(List::size));
-	        Set<String> processedConversations = new HashSet<>();
+	// Main method
+	public static void main(String[] args) {
+	    int conversationCount = 1; // Example conversation count
+	    List<Product> receivedOrder = readOrderFromAmazon(conversationCount);
 
-	        // Initialize products with initial stock
-	        initializeProducts(products);
+	    if (!receivedOrder.isEmpty()) {
+	        // Process the received order and generate response
+	        Map<String, Product> products = new HashMap<>();
+	        // Populate products map with data
 
-	        int conversationCount = 1;
-
-	        while (hasStock(products)) {
-	            System.out.println("Conversation " + conversationCount + " with Amazon:");
-
-	            // Read order from Amazon
-	            List<Product> order = readOrderFromAmazon(conversationCount);
-	            orderQueue.add(order);
-
-	            // Process orders in the queue
-	            while (!orderQueue.isEmpty()) {
-	                List<Product> currentOrder = orderQueue.poll();
-	                if (!processedConversations.contains(conversationCount + "_" + currentOrder.hashCode())) {
-	                    processOrder(products, currentOrder);
-	                    generateResponseToAmazon(products, conversationCount);
-	                    processedConversations.add(conversationCount + "_" + currentOrder.hashCode());
-	                }
-	            }
-
-	            conversationCount++;
-	        }
-
-	        System.out.println("Business is closed. All stock depleted.");
+	        generateResponseToAmazon(products, conversationCount);
 	    }
+	}
 
 	    // Initialize products with initial stock
 	    private static void initializeProducts(Map<String, Product> products) {
@@ -57,27 +38,33 @@ public class Main {
 	        return false;
 	    }
 
-	 // Read order from Amazon Json file
 	    private static List<Product> readOrderFromAmazon(int conversationCount) {
 	        List<Product> order = new ArrayList<>();
 
-	        JsonParser parser = new JsonParser();
-	        try (FileReader reader = new FileReader("src/fromAmazon" + conversationCount + ".Json")) { // Using relative path
-	            Object obj = parser.parse(reader);
-	            JsonArray orderArray = (JsonArray) obj;
-	            for (JsonElement item : orderArray) {
-	                JsonObject productJson = item.getAsJsonObject();
-	                String productName = productJson.get("name").getAsString();
-	                int quantity = productJson.get("quantity").getAsInt();
-	                order.add(new Product(productName, "", 0, quantity));
+	        File fromAmazonFile = new File("src/fromAmazon.json");
+	        if (fromAmazonFile.exists()) {
+	            JsonParser parser = new JsonParser();
+	            try (FileReader reader = new FileReader(fromAmazonFile)) {
+	                Object obj = parser.parse(reader);
+	                JsonArray orderArray = (JsonArray) obj;
+	                for (JsonElement item : orderArray) {
+	                    JsonObject productJson = item.getAsJsonObject();
+	                    String productName = productJson.get("name").getAsString();
+	                    String description = productJson.get("description").getAsString(); 
+	                    int stock = productJson.get("stock").getAsInt(); // Change "quantity" to "stock"
+	                    order.add(new Product(productName, description, 0, stock));
+	                }
+	            } catch (IOException | JsonSyntaxException e) {
+	                e.printStackTrace();
 	            }
-	        } catch (IOException | JsonSyntaxException e) {
-	            e.printStackTrace();
+	            System.out.println("Received order from Amazon: " + order);
+	        } else {
+	            System.out.println("No order file found for conversation " + conversationCount);
 	        }
 
-	        System.out.println("Received order from Amazon: " + order);
 	        return order;
 	    }
+
 
 
 	    // Process order and update inventory
