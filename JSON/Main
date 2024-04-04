@@ -1,0 +1,122 @@
+package json;
+import java.util.*;
+
+import com.google.gson.*;
+
+import java.io.*;
+import java.text.ParseException;
+
+public class Main {
+	 public static void main(String[] args) {
+	        Map<String, Product> products = new LinkedHashMap<>(); // Using LinkedHashMap for maintaining insertion order
+	        Queue<List<Product>> orderQueue = new PriorityQueue<>(Comparator.comparingInt(List::size));
+	        Set<String> processedConversations = new HashSet<>();
+
+	        // Initialize products with initial stock
+	        initializeProducts(products);
+
+	        int conversationCount = 1;
+
+	        while (hasStock(products)) {
+	            System.out.println("Conversation " + conversationCount + " with Amazon:");
+
+	            // Read order from Amazon
+	            List<Product> order = readOrderFromAmazon(conversationCount);
+	            orderQueue.add(order);
+
+	            // Process orders in the queue
+	            while (!orderQueue.isEmpty()) {
+	                List<Product> currentOrder = orderQueue.poll();
+	                if (!processedConversations.contains(conversationCount + "_" + currentOrder.hashCode())) {
+	                    processOrder(products, currentOrder);
+	                    generateResponseToAmazon(products, conversationCount);
+	                    processedConversations.add(conversationCount + "_" + currentOrder.hashCode());
+	                }
+	            }
+
+	            conversationCount++;
+	        }
+
+	        System.out.println("Business is closed. All stock depleted.");
+	    }
+
+	    // Initialize products with initial stock
+	    private static void initializeProducts(Map<String, Product> products) {
+	        products.put("product1", new Product("Product 1", "Description 1", 10.0, 50));
+	        products.put("product2", new Product("Product 2", "Description 2", 15.0, 30));
+	        products.put("product3", new Product("Product 3", "Description 3", 20.0, 40));
+	    }
+
+	    // Check if there is any stock left
+	    private static boolean hasStock(Map<String, Product> products) {
+	        for (Product product : products.values()) {
+	            if (product.stock > 0) {
+	                return true;
+	            }
+	        }
+	        return false;
+	    }
+
+	 // Read order from Amazon Json file
+	    private static List<Product> readOrderFromAmazon(int conversationCount) {
+	        List<Product> order = new ArrayList<>();
+
+	        JsonParser parser = new JsonParser();
+	        try (FileReader reader = new FileReader("src/fromAmazon" + conversationCount + ".Json")) { // Using relative path
+	            Object obj = parser.parse(reader);
+	            JsonArray orderArray = (JsonArray) obj;
+	            for (JsonElement item : orderArray) {
+	                JsonObject productJson = item.getAsJsonObject();
+	                String productName = productJson.get("name").getAsString();
+	                int quantity = productJson.get("quantity").getAsInt();
+	                order.add(new Product(productName, "", 0, quantity));
+	            }
+	        } catch (IOException | JsonSyntaxException e) {
+	            e.printStackTrace();
+	        }
+
+	        System.out.println("Received order from Amazon: " + order);
+	        return order;
+	    }
+
+
+	    // Process order and update inventory
+	    private static void processOrder(Map<String, Product> products, List<Product> order) {
+	        for (Product product : order) {
+	            Product existingProduct = products.get(product.name);
+	            if (existingProduct != null && existingProduct.stock >= product.stock) {
+	                existingProduct.stock -= product.stock;
+	                System.out.println("Processed order for: " + product.name);
+	            } else {
+	                System.out.println("Insufficient stock for: " + product.name);
+	            }
+	        }
+	    }
+
+	 // Generate response to Amazon and update toAmazon.Json
+	    private static void generateResponseToAmazon(Map<String, Product> products, int conversationCount) {
+	        JsonArray responseArray = new JsonArray();
+	        for (Product product : products.values()) {
+	            JsonObject productJson = new JsonObject();
+	            productJson.addProperty("name", product.name);
+	            productJson.addProperty("description", product.description);
+	            productJson.addProperty("price", product.price);
+	            if (product.stock > 0) {
+	                productJson.addProperty("stock", product.stock);
+	            } else {
+	                productJson.addProperty("stock", "No Stock");
+	            }
+	            responseArray.add(productJson);
+	        }
+
+	        // Write response to toAmazon.Json
+	        try (FileWriter file = new FileWriter("src/toAmazon" + conversationCount + ".Json")) { // Using relative path
+	            file.write(responseArray.toString());
+	            file.flush();
+	            System.out.println("Response sent to Amazon: " + responseArray);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+	    }
+
+}
