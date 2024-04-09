@@ -1,0 +1,11 @@
+/*
+ * set the background image to a gradient and all of the text to maroon
+ */
+
+* {
+    -fx-background-image: url('calc_background.png');
+    -fx-stroke: maroon;
+    -fx-text-fill: maroon;
+}
+
+
