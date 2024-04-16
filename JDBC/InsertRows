@@ -1,0 +1,153 @@
+package testDBConnection;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.UUID;
+
+public class InsertRows {
+
+    public static void main(String[] args) {
+        final String DATABASE_URL =
+                "jdbc:sqlserver://localhost;" +
+                "databaseName=SockStore;integratedSecurity=true;encrypt=true;TrustServerCertificate=true";
+        Connection dbConnection = null;
+        try {
+            // Establish connection
+            dbConnection = DriverManager.getConnection(DATABASE_URL);
+            dbConnection.setAutoCommit(false);
+            System.out.println("Connected successfully");
+
+            // Create a statement
+            Statement statement = dbConnection.createStatement();
+
+            // Insert data into SockTypes table
+            for (int i = 1; i <= 12; i++) {
+                // Generate unique values for Name field
+                String uniqueName = "SockType" + UUID.randomUUID().toString().substring(0, 8);
+                statement.executeUpdate("INSERT INTO SockTypes VALUES (" +
+                        i + ", " +
+                        "'" + uniqueName + "', " +
+                        "'Cotton', " +
+                        "'Color" + i + "', " +
+                        "'Medium', " +
+                        (i * 5) + ", " +
+                        "'Description for " + uniqueName + "')");
+            }
+            System.out.println("Data inserted into SockTypes table");
+
+            // Insert data into Orders table
+            for (int i = 1; i <= 12; i++) {
+                // Generate unique values for CustomerName field
+                String uniqueCustomerName = "Customer" + UUID.randomUUID().toString().substring(0, 8);
+                statement.executeUpdate("INSERT INTO Orders VALUES (" +
+                        i + ", " +
+                        i + ", " +
+                        "'" + uniqueCustomerName + "', " +
+                        i + ", " +
+                        "'2024-04-16')");
+            }
+            System.out.println("Data inserted into Orders table");
+
+            // Commit transaction
+            dbConnection.commit();
+            System.out.println("Transaction committed");
+
+            // Select and print records from SockTypes table
+            ResultSet sockTypesResultSet = statement.executeQuery("SELECT * FROM SockTypes");
+            System.out.println("Records in SockTypes table:");
+            while (sockTypesResultSet.next()) {
+                System.out.println(sockTypesResultSet.getInt(1) + ", " +
+                        sockTypesResultSet.getString(2) + ", " +
+                        sockTypesResultSet.getString(3) + ", " +
+                        sockTypesResultSet.getString(4) + ", " +
+                        sockTypesResultSet.getString(5) + ", " +
+                        sockTypesResultSet.getDouble(6) + ", " +
+                        sockTypesResultSet.getString(7));
+            }
+
+            // Select and print records from Orders table
+            ResultSet ordersResultSet = statement.executeQuery("SELECT * FROM Orders");
+            System.out.println("Records in Orders table:");
+            while (ordersResultSet.next()) {
+                System.out.println(ordersResultSet.getInt(1) + ", " +
+                        ordersResultSet.getInt(2) + ", " +
+                        ordersResultSet.getString(3) + ", " +
+                        ordersResultSet.getInt(4) + ", " +
+                        ordersResultSet.getString(5));
+            }
+
+            // Demonstrate deletion by deleting a specific row from SockTypes table
+            int deletedRows = statement.executeUpdate("DELETE FROM SockTypes WHERE SockTypeID = 1");
+            System.out.println(deletedRows + " row(s) deleted from SockTypes table");
+
+            // Select and print remaining records from SockTypes table
+            ResultSet remainingSockTypesResultSet = statement.executeQuery("SELECT * FROM SockTypes");
+            System.out.println("Remaining records in SockTypes table:");
+            while (remainingSockTypesResultSet.next()) {
+                System.out.println(remainingSockTypesResultSet.getInt(1) + ", " +
+                        remainingSockTypesResultSet.getString(2) + ", " +
+                        remainingSockTypesResultSet.getString(3) + ", " +
+                        remainingSockTypesResultSet.getString(4) + ", " +
+                        remainingSockTypesResultSet.getString(5) + ", " +
+                        remainingSockTypesResultSet.getDouble(6) + ", " +
+                        remainingSockTypesResultSet.getString(7));
+            }
+
+            // Insert more data to bring both tables up to a minimum of 10 records
+            for (int i = 13; i <= 20; i++) {
+                // Generate unique values for Name field
+                String uniqueName = "SockType" + UUID.randomUUID().toString().substring(0, 8);
+                statement.executeUpdate("INSERT INTO SockTypes VALUES (" +
+                        i + ", " +
+                        "'" + uniqueName + "', " +
+                        "'Wool', " +
+                        "'Color" + i + "', " +
+                        "'Large', " +
+                        (i * 5) + ", " +
+                        "'Description for " + uniqueName + "')");
+            }
+            System.out.println("Additional data inserted into SockTypes table");
+
+            for (int i = 13; i <= 20; i++) {
+                // Generate unique values for CustomerName field
+                String uniqueCustomerName = "Customer" + UUID.randomUUID().toString().substring(0, 8);
+                statement.executeUpdate("INSERT INTO Orders VALUES (" +
+                        i + ", " +
+                        i + ", " +
+                        "'" + uniqueCustomerName + "', " +
+                        i + ", " +
+                        "'2024-04-17')");
+            }
+            System.out.println("Additional data inserted into Orders table");
+
+            // Commit transaction
+            dbConnection.commit();
+            System.out.println("Transaction committed");
+
+        } catch (SQLException sqlE) {
+            System.out.println("Encountered a problem: " + sqlE.getMessage());
+            // Rollback transaction in case of failure
+            try {
+                if (dbConnection != null) {
+                    dbConnection.rollback();
+                    System.out.println("Transaction rolled back");
+                }
+            } catch (SQLException e) {
+                System.out.println("Failed to rollback transaction: " + e.getMessage());
+            }
+        } finally {
+            // Close connection
+            try {
+                if (dbConnection != null) {
+                    dbConnection.close();
+                    System.out.println("Connection closed");
+                }
+            } catch (SQLException e) {
+                System.out.println("Failed to close connection: " + e.getMessage());
+            }
+        }
+    }
+}
