@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.paint.Color?>
+<?import pomPomTree.MyCircle?>
+<?import pomPomTree.Controller?>
+
+<Pane id="background" fx:id="background" prefHeight="529.0" prefWidth="718.0" stylesheets="@styles.css" 
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pomPomTree.Controller">
+    <children>
+        <MyCircle id="white" fx:id="white_pom" centerX="38.0" centerY="63.0" radius="25.0" styleClass="pompom">
+            <fill>
+                <Color red="0.999" green="0.999" blue="0.999" />
+            </fill>
+        </MyCircle>
+        <MyCircle id="cloud" fx:id="cloud_pom" centerX="38.0" centerY="121.0" radius="25.0" styleClass="pompom">
+            <fill>
+                <Color red="0.981" green="0.99" blue="0.80" />
+            </fill>
+        </MyCircle>
+        <MyCircle id="tango" fx:id="tango_pom" centerX="38.0" centerY="178.0" radius="25.0" styleClass="pompom">
+            <fill>
+                <Color red=".98" green="0.85" blue="0.08" />
+            </fill>
+        </MyCircle>
+        <MyCircle id="redRibbon" fx:id="redRibbon_pom" centerX="38.0" centerY="239.0" radius="25.0" styleClass="pompom">
+            <fill>
+                <Color red="0.91" green="0.36" blue="0.46" />
+            </fill>
+        </MyCircle>
+        <MyCircle id="cardinal" fx:id="cardinal_pom" centerX="38.0" centerY="302.0" radius="25.0" rotate="88.2" styleClass="pompom">
+            <fill>
+                <Color red="0.92" green="0.06" blue="0.06" />
+            </fill>
+        </MyCircle>
+        <MyCircle id="cerise" fx:id="cerise_pom" centerX="38.0" centerY="359.0" radius="25.0" styleClass="pompom">
+            <fill>
+                <Color red="0.57" green="0.15" blue="0.33" />
+            </fill>
+        </MyCircle>
+        <MyCircle id="mahogany" fx:id="mahogany_pom" centerX="38.0" centerY="421.0" radius="25.0" styleClass="pompom">
+            <fill>
+                <Color red="0.61" green="0.03" blue="0.03" />
+            </fill>
+        </MyCircle>
+        <MyCircle id="thunderbird" fx:id="thunderbird_pom" centerX="99.0" centerY="63.0" radius="25.0" styleClass="pompom">
+            <fill>
+                <Color red="0.97" green="0.63" blue="0.11" />
+            </fill>
+        </MyCircle>
+        <MyCircle id="amour" fx:id="amour_pom" centerX="99.0" centerY="121.0" radius="25.0" styleClass="pompom">
+            <fill>
+                <Color red="0.96" green="0.67" blue="0.81" />
+            </fill>
+        </MyCircle>
+        <MyCircle id="persianBlue" fx:id="persianBlue_pom" centerX="99.0" centerY="178.0" radius="25.0" styleClass="pompom">
+            <fill>
+                <Color red="0.03" green="0.75" blue="1" />
+            </fill>
+        </MyCircle>
+        <MyCircle id="turquoise" fx:id="turquoise_pom" centerX="99.0" centerY="239.0" radius="25.0" styleClass="pompom">
+            <fill>
+                <Color red="0.25" green="0.88" blue="0.82" />
+            </fill>
+        </MyCircle>
+        <MyCircle id="mineralGreen" fx:id="mineralGreen_pom" centerX="99.0" centerY="302.0" radius="25.0" styleClass="pompom">
+            <fill>
+                <Color red="0.4" green="0.48" blue="0.43" />
+            </fill>
+        </MyCircle>
+        <MyCircle id="lime" fx:id="lime_pom" centerX="99.0" centerY="359.0" radius="25.0" styleClass="pompom">
+            <fill>
+                <Color red="0.47" green="0.96" blue="0.47" />
+            </fill>
+        </MyCircle>
+        <MyCircle id="java" fx:id="java_pom" centerX="99.0" centerY="421.0" radius="25.0" styleClass="pompom">
+            <fill>
+                <Color red="0.01" green="1" blue="1" />
+            </fill>
+        </MyCircle>
+        <Label fx:id="rootLabel" layoutX="600.0" layoutY="100.0" text="Root" styleClass="line" />
+        <Label text="Double-click any circle to insert or remove it from the Binary Search Tree. Keep trying until your tree is properly balanced."
+               layoutX="250" layoutY="650" styleClass="line" />
+    </children>
+</Pane>

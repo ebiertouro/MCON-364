@@ -1,0 +1,10 @@
+.pompom {
+    -fx-stroke: black;
+    -fx-stroke-width: 2px;
+}
+.line {
+    -fx-stroke: black;
+    -fx-stroke-width: 2; 
+    -fx-font-family: "Comic Sans MS"; 
+    -fx-font-size: 13px;
+}
