@@ -1,0 +1,31 @@
+package testDBConnection;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Savepoint;
+import java.sql.Statement;
+
+public class TransactionManager {
+    public static void illustrateSavepointsAndRollbacks(Connection connection) {
+        try {
+            connection.setAutoCommit(false); // Start transaction
+            System.out.println("Transaction started.");
+
+            Savepoint savepoint = connection.setSavepoint(); // Create savepoint
+            System.out.println("Savepoint created.");
+
+            // Make changes
+            Statement statement = connection.createStatement();
+            statement.executeUpdate("UPDATE PART SET WAREHOUSE = 4 WHERE UNITS_ON_HAND >= 20");
+            System.out.println("Update executed: Set WAREHOUSE = 4 for parts with UNITS_ON_HAND >= 20");
+
+            connection.rollback(savepoint); // Rollback to savepoint
+            System.out.println("Rolled back to savepoint.");
+
+            connection.commit(); // Commit transaction
+            System.out.println("Transaction committed.");
+        } catch (SQLException e) {
+            System.out.println("Encountered a problem: " + e.getMessage());
+        }
+    }
+}
