@@ -1,0 +1,91 @@
+package testDBConnection;
+
+import javax.sql.rowset.CachedRowSet;
+import javax.sql.rowset.RowSetProvider;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class DataRetrievalManager {
+	
+	    public static void printAllTableData(Connection connection) {
+	        try {
+	            DatabaseMetaData metaData = connection.getMetaData();
+	            ResultSet tables = metaData.getTables(null, null, "%", new String[]{"TABLE"});
+
+	            while (tables.next()) {
+	                String tableName = tables.getString("TABLE_NAME");
+
+	                printTableData(connection, tableName);
+	            }
+	        } catch (SQLException e) {
+	            System.out.println("Encountered a problem: " + e.getMessage());
+	        }
+	    }
+
+	    private static void printTableData(Connection connection, String tableName) {
+	        try {
+	            // Query to retrieve all data from the specified table
+	            String query = "SELECT * FROM " + tableName;
+
+	            try (Statement statement = connection.createStatement();
+	                 ResultSet resultSet = statement.executeQuery(query)) {
+
+	                ResultSetMetaData metaData = resultSet.getMetaData();
+
+	                // Print database structure
+	                System.out.println("Table Name: " + tableName);
+	                int columnCount = metaData.getColumnCount();
+	                for (int i = 1; i <= columnCount; i++) {
+	                    System.out.println("\tColumn Name: " + metaData.getColumnName(i) +
+	                            ", Type: " + metaData.getColumnTypeName(i));
+	                }
+
+	                // Print table data
+	                System.out.println("Data for Table: " + tableName);
+	                while (resultSet.next()) {
+	                    for (int i = 1; i <= columnCount; i++) {
+	                        System.out.print(metaData.getColumnName(i) + ": " + resultSet.getString(i) + ", ");
+	                    }
+	                    System.out.println();
+	                }
+	            }
+	        } catch (SQLException e) {
+	            System.out.println("Encountered a problem: " + e.getMessage());
+	        }
+	    }
+	
+
+    public static void printTableDataWithPreparedStatement(Connection connection, String state) {
+        try {
+            // Task 2: Using PreparedStatement
+            String query = "SELECT * FROM EMPLOYEE WHERE EMP_STATE = ?";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setString(1, state);
+
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    CachedRowSet cachedRowSet = RowSetProvider.newFactory().createCachedRowSet();
+                    cachedRowSet.populate(resultSet);
+
+                    ResultSetMetaData metaData = cachedRowSet.getMetaData();
+                    int columnCount = metaData.getColumnCount();
+
+                    System.out.println("Printing data with PreparedStatement where state = " + state + ":");
+                    while (cachedRowSet.next()) {
+                        for (int i = 1; i <= columnCount; i++) {
+                            System.out.print(metaData.getColumnName(i) + ": " + cachedRowSet.getString(i) + ", ");
+                        }
+                        System.out.println();
+                    }
+                }
+            }
+            
+        } catch (SQLException e) {
+            System.out.println("Encountered a problem: " + e.getMessage());
+        }
+    }
+}
