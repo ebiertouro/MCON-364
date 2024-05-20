@@ -1,0 +1,25 @@
+package testDBConnection;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+
+public class MainDBTest {
+    public static void main(String[] args) {
+        try (Connection dbConnection = DatabaseConnectionManager.getConnection()) {
+            System.out.println("Connection successful");
+
+            // Task 1: Reading and Printing Database Structure and Data
+            DataRetrievalManager.printAllTableData(dbConnection);
+
+            // Task 2: Using PreparedStatement
+            DataRetrievalManager.printTableDataWithPreparedStatement(dbConnection, "FL");
+            DataRetrievalManager.printTableDataWithPreparedStatement(dbConnection, "NY");
+
+            // Task 3: Working with Savepoints and Rollbacks
+            TransactionManager.illustrateSavepointsAndRollbacks(dbConnection);
+
+        } catch (SQLException e) {
+            System.out.println("Encountered a problem: " + e.getMessage());
+        }
+    }
+}
