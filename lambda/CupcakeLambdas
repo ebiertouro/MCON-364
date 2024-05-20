@@ -1,0 +1,123 @@
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+public class CupcakeTest {
+    
+    public static void main(String[] args) {
+        List<Cupcake> cupcakes = getCupcakes(); // Assume this method returns a list of Cupcake objects
+        
+        // 1. Count cupcakes with frosting "Chocolate" and more than 300 calories
+        long chocolateCupcakesCount = cupcakes.stream()
+                                              .filter(c -> c.getFrosting().equals("Chocolate"))
+                                              .filter(c -> c.getCalories() > 300)
+                                              .count();
+        
+        // 2. Find the average calories of cupcakes with sprinkles
+        double averageCaloriesOfSprinkledCupcakes = cupcakes.stream()
+                                                             .filter(Cupcake::hasSprinkles)
+                                                             .mapToInt(Cupcake::getCalories)
+                                                             .average()
+                                                             .orElse(0);
+        
+        // 3. Group cupcakes by flavor and then by frosting type
+        Map<String, Map<String, List<Cupcake>>> cupcakesByFlavorAndFrosting = cupcakes.stream()
+                                                                                        .collect(Collectors.groupingBy(Cupcake::getFlavor,
+                                                                                                                         Collectors.groupingBy(Cupcake::getFrosting)));
+        
+        // 4. Find the cupcake with the highest calorie count among those with whole wheat crust
+        Optional<Cupcake> maxCalorieWholeWheatCupcake = cupcakes.stream()
+                                                                 .filter(Cupcake::isWholeWheat)
+                                                                 .max(Comparator.comparingInt(Cupcake::getCalories));
+        
+        // 5. Calculate the total calories of cupcakes with vanilla frosting
+        int totalCaloriesOfVanillaCupcakes = cupcakes.stream()
+                                                      .filter(c -> c.getFrosting().equals("Vanilla"))
+                                                      .mapToInt(Cupcake::getCalories)
+                                                      .sum();
+        
+        // 6. Chain filtering and mapping: Get flavors of low-calorie cupcakes with sprinkles
+        Set<String> flavorsOfLowCalorieSprinkledCupcakes = cupcakes.stream()
+                                                                    .filter(c -> c.getCalories() < 200)
+                                                                    .filter(Cupcake::hasSprinkles)
+                                                                    .map(Cupcake::getFlavor)
+                                                                    .collect(Collectors.toSet());
+        
+        // 7. Count cupcakes by calorie range (0-100, 101-200, 201-300, 301+)
+        Map<String, Long> cupcakesCountByCalorieRange = cupcakes.stream()
+                                                                .collect(Collectors.groupingBy(
+                                                                    cupcake -> {
+                                                                        int calories = cupcake.getCalories();
+                                                                        if (calories <= 100) return "0-100";
+                                                                        else if (calories <= 200) return "101-200";
+                                                                        else if (calories <= 300) return "201-300";
+                                                                        else return "301+";
+                                                                    },
+                                                                    Collectors.counting()));
+        
+        // 8. Find the cupcake with the highest calorie count and the cupcake with the lowest calorie count
+        Optional<Cupcake> maxCalorieCupcake = cupcakes.stream()
+                                                       .max(Comparator.comparingInt(Cupcake::getCalories));
+        
+        Optional<Cupcake> minCalorieCupcake = cupcakes.stream()
+                                                       .min(Comparator.comparingInt(Cupcake::getCalories));
+        
+        // 9. Calculate the total number of calories of cupcakes with a specific frosting type
+        int totalCaloriesOfChocolateCupcakes = cupcakes.stream()
+                                                        .filter(c -> c.getFrosting().equals("Chocolate"))
+                                                        .mapToInt(Cupcake::getCalories)
+                                                        .sum();
+        
+        // 10. Check if all cupcakes have calories less than 500
+        boolean allLowCalorie = cupcakes.stream()
+                                        .allMatch(c -> c.getCalories() < 500);
+        
+        // 11. Get the first cupcake with sprinkles, if any
+        Optional<Cupcake> firstSprinkledCupcake = cupcakes.stream()
+                                                           .filter(Cupcake::hasSprinkles)
+                                                           .findFirst();
+        
+        // 12. Calculate the average calories of all cupcakes with whole wheat crust
+        double averageCaloriesOfWholeWheatCupcakes = cupcakes.stream()
+                                                             .filter(Cupcake::isWholeWheat)
+                                                             .mapToInt(Cupcake::getCalories)
+                                                             .average()
+                                                             .orElse(0);
+        
+        // 13. Concatenate flavors of all cupcakes into a single string, sorted alphabetically
+        String concatenatedFlavors = cupcakes.stream()
+                                             .map(Cupcake::getFlavor)
+                                             .sorted()
+                                             .collect(Collectors.joining(", "));
+        
+        // 14. Check if any cupcake has exactly 250 calories
+        boolean hasCupcakeWith250Calories = cupcakes.stream()
+                                                     .anyMatch(c -> c.getCalories() == 250);
+        
+        // 15. Get the unique frosting types of cupcakes with less than 100 calories, sorted alphabetically
+        Set<String> uniqueLowCalorieFrostings = cupcakes.stream()
+                                                        .filter(c -> c.getCalories() < 100)
+                                                        .map(Cupcake::getFrosting)
+                                                        .sorted()
+                                                        .collect(Collectors.toSet());
+    }
+    
+    // Dummy Cupcake class
+    static class Cupcake {
+        private String flavor;
+        private String frosting;
+        private int calories;
+        private boolean wholeWheat;
+        private boolean sprinkles;
+        
+        // Constructor, getters, setters
+    }
+    
+    // Dummy method to get a list of cupcakes
+    static List<Cupcake> getCupcakes() {
+        // Dummy implementation
+        return new ArrayList<>();
+    }
+}
