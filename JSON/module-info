@@ -1,3 +1,0 @@
-module JSON {
-	requires com.google.gson;
-}
