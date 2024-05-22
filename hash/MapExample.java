@@ -122,7 +122,7 @@ public class MapExample {
 	    	
 	        IntPredicate isValidInput = i -> i > lowerbound && i <= upperbound && i != priorChoice;
 
-	        System.out.println("Enter a number from the list: ");
+	        System.out.println("Enter your choice: ");
 	        int menuOption = input.nextInt();
 
 	        while (!isValidInput.test(menuOption)) {
