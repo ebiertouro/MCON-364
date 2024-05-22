@@ -20,16 +20,7 @@ public class Vertex  implements Comparable<Vertex>{
 }
 	
 	public String toString() {
-	    StringBuilder stringBuilder = new StringBuilder();
-	    stringBuilder.append(data.toString()).append(" - ").append(weightToFirst).append(" - ").append(next.data.toString());
-
-	    Vertex currentVertex = next.next;
-	    while (currentVertex != null) {
-	        stringBuilder.append("\n\t - ").append(weightToSecond).append(" - ").append(currentVertex.data.toString());
-	        currentVertex = currentVertex.next; // Move to the next vertex
-	    }
-	    
-	    return stringBuilder.toString();
+	    return this.data.toString();
 	}
 
 	
