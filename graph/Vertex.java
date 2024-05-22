@@ -20,7 +20,7 @@ public class Vertex  implements Comparable<Vertex>{
 }
 	
 	public String toString() {
-	    return this.data.toString();
+	    return data.toString();
 	}
 
 	
