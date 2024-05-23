@@ -49,7 +49,7 @@ public class CustomMap<K, V extends Comparable<V>>  implements Iterable<MapEntry
 	}
 
 
-	public LinkedList<MapEntryInterface> getAllEntries() {
+	private LinkedList<MapEntryInterface> getAllEntries() {
 	    LinkedList<MapEntryInterface> allEntries = new LinkedList<>();
 	    for (LinkedList<MapEntryInterface> bucket : map) {
 	        if (bucket != null) {
