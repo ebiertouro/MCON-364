@@ -175,14 +175,7 @@ public class WeightedGraph implements Iterable<Vertex>{
 	    int toVertexIndex = vertexTracker.indexOf(toVertexData.toString());
 	    Vertex toVertex = graph.get(toVertexIndex);
 		
-		  if (fromVertex.next.data.equals(toVertex.data)) {
-	            return fromVertex.weightToFirst;
-	        }
-		  else if (fromVertex.next.next != null && fromVertex.next.next.data.equals(toVertex.data)){
-			  return fromVertex.weightToSecond;
-		  }
-		  else
-			  return 0;
+		return findWeight(fromVertex, toVertex);
 	}
 
 
